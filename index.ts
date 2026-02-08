@@ -21,11 +21,12 @@ const pool = new Pool({
   port: Number(process.env.DB_PORT) || 5432,
 });
 
+// Test DB Connection
 pool.query("SELECT NOW()", (err, res) => {
   if (err) {
-    console.error("❌ Connection Error:", err.message);
+    console.error("Connection Error:", err.message);
   } else {
-    console.log("✅ Postgres Connected at:", res.rows[0].now);
+    console.log("Postgres Connected at:", res.rows[0].now);
   }
 });
 
@@ -37,7 +38,9 @@ app.get("/", (req, res) => {
 // Get all transactions
 app.get("/transactions", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM transactions");
+    const result = await pool.query(
+      "SELECT t.id, t.date, t.description, t.amount, c.name AS category_name FROM transactions t JOIN categories c ON t.category_id = c.id ORDER BY t.date DESC",
+    );
     res.json(result.rows);
   } catch (err) {
     console.error(err);
