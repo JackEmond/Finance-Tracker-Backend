@@ -1,0 +1,23 @@
+# Dependency directories
+node_modules/
+
+# TypeScript build output
+dist/
+out/
+
+# Environment variables (Secrets!)
+.env
+.env.local
+.env.development.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE settings (Optional, but keeps your repo clean)
+.vscode/
+.idea/
