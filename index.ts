@@ -48,6 +48,49 @@ app.get("/transactions", async (req, res) => {
   }
 });
 
+// Get all categories
+app.get("/categories", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM categories ORDER BY name ASC",
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+// Add a transaction
+app.post("/transactions", async (req, res) => {
+  const { description, amount, type, category_id, date } = req.body;
+
+  try {
+    // Basic validation
+    if (!description || !amount || !category_id || !date) {
+      res.status(400).send("Missing required fields");
+      return; /* Explicit return to stop execution */
+    }
+
+    // Adjust amount based on type (expense should be negative)
+    const finalAmount =
+      type === "expense" ? -Math.abs(Number(amount)) : Math.abs(Number(amount));
+
+    // Insert new transaction
+    const result = await pool.query(
+      `INSERT INTO transactions (description, amount, date, category_id) 
+       VALUES ($1, $2, $3, $4) 
+       RETURNING *`,
+      [description, finalAmount, date, category_id],
+    );
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
